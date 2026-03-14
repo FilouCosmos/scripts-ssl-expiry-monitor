@@ -1,0 +1,58 @@
+import ssl
+import socket
+import datetime
+import requests
+from typing import Union, List
+
+# --- Configuration ---
+DOMAINES: List[str] = [
+    "google.com", 
+    "github.com", 
+    "ton-domaine-expire.fr"
+]
+SEUIL_ALERTE_JOURS: int = 30
+WEBHOOK_URL: str = "TON_LIEN_WEBHOOK_ICI" 
+# ---------------------
+
+def verifier_certificat(domaine: str) -> Union[int, str]:
+    """Vérifie la date d'expiration du certificat SSL d'un domaine."""
+    context = ssl.create_default_context()
+    conn = context.wrap_socket(socket.socket(socket.AF_INET), server_hostname=domaine)
+    conn.settimeout(5.0)
+    
+    try:
+        conn.connect((domaine, 443))
+        ssl_info = conn.getpeercert()
+        
+        if not ssl_info or 'notAfter' not in ssl_info:
+            return "Impossible de récupérer la date d'expiration."
+            
+        date_expiration_str = ssl_info['notAfter']
+        date_expiration = datetime.datetime.strptime(date_expiration_str, '%b %d %H:%M:%S %Y %Z')
+        return (date_expiration - datetime.datetime.utcnow()).days
+        
+    except Exception as e:
+        return f"Erreur de connexion : {e}"
+    finally:
+        conn.close()
+
+def envoyer_alerte(message: str) -> None:
+    """Envoie une notification push via le Webhook configuré."""
+    if WEBHOOK_URL != "TON_LIEN_WEBHOOK_ICI":
+        try:
+            requests.post(WEBHOOK_URL, json={"text": message}, timeout=5)
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur lors de l'envoi au webhook : {e}")
+    print(f"🔔 ALERTE : {message}")
+
+if __name__ == "__main__":
+    print("--- Début de l'analyse SSL ---")
+    for domaine in DOMAINES:
+        resultat = verifier_certificat(domaine)
+        if isinstance(resultat, int):
+            print(f"[{domaine}] : Expire dans {resultat} jours.")
+            if resultat < SEUIL_ALERTE_JOURS:
+                envoyer_alerte(f"! Le certificat SSL pour {domaine} expire dans {resultat} jours !")
+        else:
+            print(f"[{domaine}] : xXx {resultat}")
+    print("--- Fin de l'analyse ---")
