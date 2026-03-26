@@ -25,7 +25,7 @@ Logging Standardisé : Sortie console formatée ([INFO], [ERROR], [WARN]) pour u
 
 # Installation
 ```Bash
-git clone [https://github.com/VOTRE_USER/scripts-ssl-expiry-monitor.git](https://github.com/VOTRE_USER/scripts-ssl-expiry-monitor.git)
+git clone https://github.com/FilouCosmos/scripts-ssl-expiry-monitor.git
 cd scripts-ssl-expiry-monitor
 pip install -r requirements.txt
 ```
