@@ -1,10 +1,10 @@
-# 🔒 SSL Expiry Monitor & Webhook Alerter
+#  SSL Expiry Monitor & Webhook Alerter
 
 L'oubli du renouvellement d'un certificat TLS/SSL est une cause majeure d'interruption de service (Outage). Plutôt que de dépendre de services SaaS externes payants, ce script Python léger surveille proactivement l'expiration de vos certificats en interrogeant directement les serveurs.
 
 S'il détecte qu'un certificat approche de sa date d'expiration, il pousse immédiatement une alerte sur le canal de communication de votre équipe (Slack, Microsoft Teams, Discord) via un Webhook.
 
-## 🏗️ Architecture de Surveillance
+##  Architecture de Surveillance
 
 ```mermaid
 flowchart TD
